@@ -17,12 +17,15 @@ Here a the most important features of json-template:
 7. Mixin types
 8. Lists with (un)constrained number of elements
 
-## Example
+## Usage
 
 Here's what a simple template looks like:
 
-```
-config_template = {
+```Python
+import json
+from template import template, optional
+
+config_template = template({
     "first_name": str,
     "last_name": str,
     "age": int,
@@ -36,7 +39,11 @@ config_template = {
     "location": (str, int),
     "scores": [{float, int}]
     "some_array": [float, int]
-}
+})
+
+with open('./config.json', r) as jsonfile:
+    config = json.load(jsonfile)
+    config_template.validate(config)
 ```
 
 **What it means:**
@@ -45,5 +52,4 @@ config_template = {
  - If the `animals` field is defined, then it must be a list of objects containing the fields `name`, `age`, and `specie`
  - The `location` field must be a list of **exactly** two elements: the first must be a string, the second an integer
  - The `scores` field must be a list of floats or integers that can be mixed
-  - The `some_array` field must be a list containing either only float, or only integers
-  
+ - The `some_array` field must be a list containing either only float, or only integers
