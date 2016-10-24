@@ -191,7 +191,7 @@ config_template = template({
         }], min=1, max=5)
 })
 ```
-The `animals` field can only contain a list containing at least 1 element and at most 5 elements. `min` defaults to 0 and if max is not present `max`, the list length has no upper limit.
+The `animals` field can only contain a list containing at least 1 element and at most 5 elements. `min` defaults to 0 and if `max` is not present, the list length has no upper limit.
 
 ## TODO
 The next features coming for json-template are:
