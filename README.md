@@ -1,9 +1,9 @@
 # json-template
-Python module for defining JSON templates which can be used to validate json files and cast them into python type-consistent dictionaries.
+Python module for defining templates JSON files which can be used to validate their Python equivalents (obtained with json.load) and cast them into type-consistent dictionaries.
 
 ## Introduction
 The goal of json-template is to allow developpers to define JSON templates in Python in a simple and elegant manner.
-The most obvious use case of this module is to check and enforce the types of a config file written in JSON instead of just using json.loads and casting every value within the submodules themselves.
+The most obvious use case of this module is to check and enforce the types of a config file written in JSON instead of just using json.load and casting every value within the concerned submodules themselves.
 
 ## Features
 Here a the most important features of json-template:
@@ -13,17 +13,17 @@ Here a the most important features of json-template:
 3. Generation of example JSON file and Python dict from a template
 4. Optional fields
 5. Default values
-6. Casting to custom-defined Python objects (with `*args` and `**kwargs` support)
+6. Casting to custom-defined Python objects
 7. Mixin types
-8. Lists with (un)constrained number of elements
+8. Lists with or without a constrained number of elements
 
-## Usage
+## Basic usage
 
 Here's what a simple template looks like:
 
 ```Python
 import json
-from template import template, optional
+from jsontemplate import template, optional
 
 config_template = template({
     "first_name": str,
@@ -37,7 +37,7 @@ config_template = template({
         }
     ]),
     "location": (str, int),
-    "scores": [{float, int}]
+    "scores": [{float, int}], # {float, int} is a type mixin
     "some_array": [float, int]
 })
 
@@ -56,3 +56,148 @@ with open('./config.json', r) as jsonfile:
  - The `some_array` field must be a list containing either only float, or only integers
  
 *Note: In python2.7 `str` will automatically replaced by `unicode` for JSON compliance.*
+
+## Advanced usage
+
+### Example generation
+With the previously defined template we can do the following:
+```Python
+>>> config_template.example()
+>>> {
+    "first_name": u'example',
+    "last_name": u'example',
+    "age": 0,
+    "location": (u'example', 0),
+    "scores": [0.0], # or [0]
+    "some_array": [0.0]
+}
+
+>>> config_template.example(full=True)
+>>> {
+    "first_name": u'example',
+    "last_name": u'example',
+    "age": 0,
+    "animals": [
+        {
+            "name": u'example',
+            "age": 0,
+            "specie": u'example'
+        }
+    ],
+    "location": [u'example', 0],
+    "scores": [0.0], # or [0]
+    "some_array": [0.0]
+}
+```
+
+### Default values
+Let's modify (and simplify) our template a little:
+```Python
+>>> config_template = template({
+    "first_name": str,
+    "last_name": str,
+    "age": default(int, 42)
+})
+
+>>> config_template.example()
+>>> {
+    'first_name': u'example',
+    'last_name': u'example',
+    'age': 42
+}
+
+>>> config_template.output({
+    'first_name': u'Adrien',
+    'last_name': u'El Zein'})
+>>> {
+    'first_name': u'Adrien',
+    'last_name': u'El Zein'
+    'age': 42
+    }
+```
+
+### Casting
+It is possible to cast the Python native types of a converted JSON file into more complex and/or custom-defined Python objects.
+```Python
+from uuid import UUID
+
+def uuid(integer):
+    return UUID(int=integer)
+
+from jsontemplate import template, cast, starcast, kwcast
+
+class Animal:
+    def __init__(self, name, specie, age):
+        self.name = name
+        self.specie = specie
+        self.age = age
+    
+    def some_method(self):
+        pass
+        
+config_template = template({
+    "id": cast(uuid, source=int), # the first argument of cast doesn't have to be a type, a callable will work too
+    "animals": [starcast(Animal, source=(str, str,int))], # Animal(*('string', 'string', integer)) will be called
+    "id2": kwcast(UUID, source={'hex': str}) # UUID(**dict(hex='string')) will be called
+})
+
+print config_template.output({
+    "id": 343,
+    "animals": [(u'kupa', u'cat', 12)],
+    "id2": u'12344532323473451234453232347345'
+})
+```
+
+This script will print the following:
+```Python
+>>> {
+    'id': UUID('00000000-0000-0000-0000-000000000157'),
+    'animals': <__main__.Animal instance at 0x000000000>,
+    'id2': UUID('12344532-3234-7345-1234-453232347345')
+}
+```
+
+### Advanced mixins
+It is possible to define more complex mixin types than with a simple set, the latter being limited by actual it's inability to contain non-hashable templates.
+```Python
+from jsontemplate import template, mixin
+
+config_template = template({
+    "first_name": str,
+    "last_name": str,
+    "age": int,
+    "animal": mixin({
+            "name": str,
+            "age": int,
+            "specie": str},
+            (str, str, int))
+})
+```
+The `animal` field in this template accepts a dictionary or a tuple. This behavior would be impossible to obtain with the set notation for mixins, since dicts can't be elements of sets.
+
+### Cardinal constraints
+It is possible to check if a list has an number of elements between a min and a max:
+```Python
+from jsontemplate import template, mixin
+
+config_template = template({
+    "first_name": str,
+    "last_name": str,
+    "age": int,
+    "animals": cardinal([{
+            "name": str,
+            "age": int,
+            "specie": str
+        }], min=1, max=5)
+})
+```
+The `animals` field can only contain a list containing at least 1 element and at most 5 elements. `min` defaults to 0 and if max is not present `max`, the list length has no upper limit.
+
+## TODO
+The next features coming for json-template are:
+
+- Clean exceptions
+- Python 3 port
+- **cast mode** (may replace the current behavior): Instead of checking types, the `validate` method will try to cast the value to the template type and will fail only if the cast failed
+- **strict mode**: the json file must have no extra keys, that is, keys that are not defined in the template
+- simpler default values: Instead of the `default` specifier, the default value can simply written as is and the type will be infered from the default value
