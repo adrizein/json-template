@@ -2,9 +2,11 @@
 Python module for defining templates JSON files which can be used to validate their Python equivalents (obtained with `json.load` for example) and cast them into type-consistent dictionaries.
 
 ## Introduction
-The goal of json-template is to allow developpers to define JSON templates in Python in a simple and elegant manner.
+The goal of json-template is to allow developers to define JSON templates in Python in a simple and elegant manner.
 
 The most obvious use case of this module is to check and enforce the types of a config file written in JSON instead of just using `json.load` and casting every value within the concerned submodules. This module allows for a more explicit and centralized way of controlling the types of the configuration values for a Python project.
+
+The Python 3 port of this package is available on the python3 branch.
 
 ## Features
 Here a the most important features of json-template:
@@ -198,7 +200,6 @@ The `animals` field can only contain a list containing at least 1 element and at
 The next features coming for json-template are:
 
 - Clean exceptions
-- Python 3 port
 - **cast mode** (may replace the current behavior): Instead of checking types, the `validate` method will try to cast the value to the template type and will fail only if the cast failed
 - **strict mode**: the json file must have no extra keys, that is, keys that are not defined in the template
 - simpler default values: Instead of the `default` specifier, the default value can simply written as is and the type will be infered from the default value
