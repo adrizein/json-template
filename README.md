@@ -43,6 +43,7 @@ config_template = template({
 
 with open('./config.json', r) as jsonfile:
     config = json.load(jsonfile)
+    # raises an exception if config doesn't respect the template
     config_template.validate(config)
 ```
 
@@ -53,3 +54,4 @@ with open('./config.json', r) as jsonfile:
  - The `location` field must be a list of **exactly** two elements: the first must be a string, the second an integer
  - The `scores` field must be a list of floats or integers that can be mixed
  - The `some_array` field must be a list containing either only float, or only integers
+ 
