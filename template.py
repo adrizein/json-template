@@ -5,6 +5,7 @@
 #TODO: strict mode
 
 from random import randrange
+import json
 
 class template:
 
@@ -27,6 +28,10 @@ class template:
 
     def validate(self, config):
         self._validate(config, self)
+    
+    def validate_jsonfile(self, jsonfile):
+        data = json.load(jsonfile)
+        self.validate(data)
 
     @staticmethod
     def _validate(config, t):
