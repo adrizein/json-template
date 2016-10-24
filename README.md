@@ -56,7 +56,7 @@ with open('./config.json', r) as jsonfile:
  - The `scores` field must be a list of floats or integers that can be mixed
  - The `some_array` field must be a list containing either only float, or only integers
  
-*Note: In python2.7 `str` will automatically replaced by `unicode` for JSON compliance.*
+*Note: In python2.7 `str` will automatically be replaced by `unicode` for JSON compliance.*
 
 ## Advanced usage
 
