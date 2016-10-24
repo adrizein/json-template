@@ -140,7 +140,7 @@ class Animal:
         
 config_template = template({
     "id": cast(uuid, source=int), # the first argument of cast doesn't have to be a type, a callable will work too
-    "animals": [starcast(Animal, source=(str, str,int))], # Animal(*('string', 'string', integer)) will be called
+    "animals": [starcast(Animal, source=(str, str, int))], # Animal(*('string', 'string', integer)) will be called
     "id2": kwcast(UUID, source={'hex': str}) # UUID(**dict(hex='string')) will be called
 })
 
@@ -155,7 +155,7 @@ This script will print the following:
 ```Python
 >>> {
     'id': UUID('00000000-0000-0000-0000-000000000157'),
-    'animals': <__main__.Animal instance at 0x000000000>,
+    'animals': [<__main__.Animal instance at 0x000000000>],
     'id2': UUID('12344532-3234-7345-1234-453232347345')
 }
 ```
