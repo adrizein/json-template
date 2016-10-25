@@ -161,7 +161,7 @@ This script will print the following:
 ```
 
 ### Advanced mixins
-It is possible to define more complex mixin types than with a simple set, the latter being limited by actual it's inability to contain non-hashable templates.
+It is possible to define more complex mixin types than with a simple set, the latter being limited by its inability to contain non-hashable templates.
 ```Python
 from jsontemplate import template, mixin
 
