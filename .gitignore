@@ -1,1 +1,3 @@
 *.pyc
+jsontemplate.egg-info
+.idea
