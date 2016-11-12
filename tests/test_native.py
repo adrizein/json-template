@@ -4,7 +4,7 @@
 import json
 import unittest
 
-from template import template
+from jsontemplate import template
 
 class NativeTests(unittest.TestCase):
 

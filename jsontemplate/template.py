@@ -4,6 +4,8 @@
 #TODO: unittests
 #TODO: strict mode
 
+__all__ = ['template', 'optional', 'default', 'mixin'];
+
 from random import randrange
 import json
 

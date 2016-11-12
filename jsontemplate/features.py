@@ -1,7 +1,9 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-from template import template
+__all__ = ['cardinal', 'cast', 'starcast', 'kwcast']
+
+from .template import template
 
 class cardinal(template):
 
