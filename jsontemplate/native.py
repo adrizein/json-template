@@ -7,7 +7,7 @@ import json
 
 from .exceptions import *
 
-__all__ = ['template', 'mixin', 'optional', 'default']
+__all__ = ['template', 'load_json', 'mixin', 'optional', 'default']
 
 
 def load_json(filename, t=None, full=False, strict=False):

@@ -19,6 +19,7 @@ Here a the most important features of jsontemplate:
 6. Casting to custom-defined Python objects
 7. Mixin types
 8. Lists with or without a constrained number of elements
+8. Strict mode (no extra keys and casting)
 
 ## Basic usage
 
@@ -122,7 +123,7 @@ Let's modify (and simplify) our template a little:
 
 ### Strict mode
 By passing `strict=True` to the `template` factory, or in the `validate` and `output` methods,
-the template will not accept extra keys in the dictionnary and will enforce the types
+the template will not accept extra keys in the json file and will enforce the types
 instead of checking that the values are castable.
 
 ### Casting
