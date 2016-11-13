@@ -3,25 +3,24 @@
 
 import json
 import unittest
-from copy import deepcopy
 
-from jsontemplate import template, default
+from jsontemplate import template, size
 
-class DefaultTests(unittest.TestCase):
+class SizeTests(unittest.TestCase):
 
     dict_template = {
         "first_name": str,
         "last_name": str,
         "age": int,
-        "animals": default([
+        "animals": [
             {
                 "name": str,
                 "age": int,
-                "specie": default(str, u'cat'),
+                "specie": str
             }
-        ], []),
+        ],
         "location": (str, int),
-        "scores": [{float, int}],
+        "scores": size([{float, int}], min=1, max=5)
     }
 
     @classmethod
@@ -59,29 +58,28 @@ class DefaultTests(unittest.TestCase):
     def test_validate_valid_data(self):
         self.assertIsNone(self.template.validate(self.data))
 
-    def test_validate_default_str(self):
-        del self.data['animals'][0]['specie']
-        self.assertIsNone(self.template.validate(self.data))
-
-    def test_validate_default_list(self):
-        del self.data['animals']
-        self.assertIsNone(self.template.validate(self.data))
-
-    def test_validate_invalid_list(self):
-        self.data['animals'] = self.data['animals'][0]
+    def test_validate_min_cardinal(self):
+        self.data['scores'] = []
         self.assertRaises(Exception, self.template.validate, self.data)
 
-    def test_validate_invalid_str(self):
-        self.data['animals'][0]['specie'] = [1,2]
+    def test_validate_max_cardinal(self):
+        self.data['scores'] = [0]*10
         self.assertRaises(Exception, self.template.validate, self.data)
 
     def test_example(self):
-        example = self.template.example()
-        self.assertEquals(example, {
+        data = self.template.example()
+        self.assertLessEqual(len(data['scores']), 5)
+        self.assertGreaterEqual(len(data['scores']), 1)
+        data['scores'] = [data['scores'][0]]
+        self.assertEquals(data, {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
-            'animals': [],
+            'animals': [{
+                'name': u'example',
+                'age': 0,
+                'specie': u'example'
+            }],
             'location': [u'example', 0],
             'scores': [0.0]
         })
@@ -91,19 +89,19 @@ class DefaultTests(unittest.TestCase):
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
-            'animals': [],
+            'animals': [
+                {
+                    'name': u'example',
+                    'age': 0,
+                    'specie': u'example'
+                }
+            ],
             'location': [u'example', 0],
-            'scores': [0.0]
+            'scores': [0.0]*5
         })
 
     def test_output(self):
         self.assertEquals(self.template.output(self.data), self.data)
-
-    def test_output_default(self):
-        data = deepcopy(self.data)
-        del self.data['animals'][0]['specie']
-        data['animals'][0]['specie'] = u'cat'
-        self.assertEquals(self.template.output(self.data), data)
 
 if __name__ == '__main__':
     unittest.main()

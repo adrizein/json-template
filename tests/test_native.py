@@ -59,11 +59,11 @@ class NativeTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_invalid_tuple(self):
-        self.data['location'][1] = u'75001'
+        self.data['location'][1] = u'75001ZEZ'
         self.assertRaises(Exception, self.template.validate, self.data)
 
     def test_validate_invalid_list(self):
-        self.data['scores'][4] = u'2'
+        self.data['scores'][4] = u'2az'
         self.assertRaises(Exception, self.template.validate, self.data)
 
     def test_validate_invalid_dict(self):
