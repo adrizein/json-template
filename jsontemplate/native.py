@@ -109,7 +109,7 @@ class Native(Template):
             self.value = value
 
         else:
-            raise ValueError("The only accepted types in strict mode are: str, int, float, bool, dict, list")
+            raise TemplateFormatError(value)
 
     def validate(self, config, strict=False):
         if (self.strict or strict) and not isinstance(config, self.value):
@@ -216,7 +216,10 @@ class Array(Template):
 
     def validate(self, config, strict=False):
         if not isinstance(config, list):
-            raise TypeError("%r must be a list" % config)
+            raise TemplateTypeError("{} should be a list, but is actually <{}>: {}".format(
+                self.name,
+                type(config).__name__,
+                repr(config)))
         ok = False
         for subt in self.value:
             try:

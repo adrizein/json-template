@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from jsontemplate import template, optional, kwcast
 
+
 class Animal:
 
     def __init__(self, age=1, name=u'medor', specie=u'dog'):
@@ -27,6 +28,7 @@ class Animal:
             'specie': self.specie,
             'name': self.name
         })
+
 
 class KWCastTests(unittest.TestCase):
 

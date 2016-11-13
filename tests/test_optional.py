@@ -6,6 +6,7 @@ import unittest
 from copy import deepcopy
 
 from jsontemplate import template, optional
+from jsontemplate.exceptions import *
 
 
 class OptionalTests(unittest.TestCase):
@@ -71,11 +72,11 @@ class OptionalTests(unittest.TestCase):
 
     def test_validate_invalid_int(self):
         self.data['age'] = u'1az2'
-        self.assertRaises(Exception, self.template.validate, self.data)
+        self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_validate_invalid_str(self):
         self.data['animal']['specie'] = [1,2]
-        self.assertRaises(Exception, self.template.validate, self.data)
+        self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
         self.assertEquals(self.template.example(), {

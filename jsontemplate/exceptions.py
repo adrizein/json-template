@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
 
 class TemplateError(Exception):
     pass
@@ -19,6 +21,10 @@ class TemplateTypeError(TemplateError):
 
 
 class ValidationError(Exception):
+    pass
+
+
+class NativeValidationError(ValidationError):
 
     def __init__(self, expected_type, actual_value, name):
         msg = "{} should be a {}, but is instead equal to {} of type {}".format(
@@ -26,7 +32,7 @@ class ValidationError(Exception):
             repr(expected_type),
             actual_value,
             repr(type(actual_value)))
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)
 
 
 class ArrayValidationError(ValidationError):
@@ -37,14 +43,14 @@ class ArrayValidationError(ValidationError):
             ', '.join(repr(t) for t in possible_types)[:-1],
             ', '.join({repr(type(v)) for v in actual_values})[:-1]
         )
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)
 
 
 class KeysValidationError(ValidationError):
 
     def __init__(self, keys, name):
         msg = "The following keys are not supposed to be in {}: {}".format(name, keys)
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)
 
 
 class SizeValidationError(ValidationError):
@@ -57,7 +63,7 @@ class SizeValidationError(ValidationError):
             msg = "{} should have at least {} elements but has {}".format(name, min, actual)
         if min == 0 or min is None:
             msg = "{} should have at most {} elements but has {}".format(name, max, actual)
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)
 
 
 class MixinValidationError(ValidationError):
@@ -69,11 +75,11 @@ class MixinValidationError(ValidationError):
             actual_value,
             repr(type(actual_value))
         )
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)
 
 
 class CastValidationError(ValidationError):
 
     def __init__(self, target, config, name):
         msg = "{} could not be cast to {}. Its content is: {}".format(name, repr(target), repr(config))
-        Exception.__init__(self, msg)
+        ValidationError.__init__(self, msg)

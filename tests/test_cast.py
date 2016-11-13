@@ -6,6 +6,7 @@ import unittest
 from copy import deepcopy
 
 from jsontemplate import template, optional, cast
+from jsontemplate.exceptions import *
 
 
 class CastTests(unittest.TestCase):
@@ -68,7 +69,7 @@ class CastTests(unittest.TestCase):
 
     def test_validate_invalid_source(self):
         self.data['age'] = 'adrien'
-        self.assertRaises(Exception, self.template.validate, self.data)
+        self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
         self.assertEquals(self.template.example(), {

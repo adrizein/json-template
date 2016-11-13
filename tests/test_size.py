@@ -5,6 +5,7 @@ import json
 import unittest
 
 from jsontemplate import template, size
+from jsontemplate.exceptions import *
 
 class SizeTests(unittest.TestCase):
 
@@ -58,13 +59,13 @@ class SizeTests(unittest.TestCase):
     def test_validate_valid_data(self):
         self.assertIsNone(self.template.validate(self.data))
 
-    def test_validate_min_cardinal(self):
+    def test_validate_min_size(self):
         self.data['scores'] = []
-        self.assertRaises(Exception, self.template.validate, self.data)
+        self.assertRaises(ValidationError, self.template.validate, self.data)
 
-    def test_validate_max_cardinal(self):
+    def test_validate_max_size(self):
         self.data['scores'] = [0]*10
-        self.assertRaises(Exception, self.template.validate, self.data)
+        self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
         data = self.template.example()
