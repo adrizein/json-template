@@ -52,8 +52,8 @@ with open('./config.json', r) as jsonfile:
 
 **What it means:**
  - The `first_name` and `last_name` fields of the JSON file must be strings
- - The `age` field of the JSON file must be a integer
- - If the `animals` field is defined, then it must be a list of objects containing the fields `name`, `age`, and `specie`
+ - The `age` field of the JSON file must castable to an integer without loss of information
+ - If the `animals` field is defined, then it must be a list of objects containing at least the fields `name`, `age`, and `specie`
  - The `location` field must be a list of **exactly** two elements: the first must be a string, the second an integer
  - The `scores` field must be a list of floats or integers that can be mixed
  - The `some_array` field must be a list containing either only float, or only integers
@@ -118,6 +118,12 @@ Let's modify (and simplify) our template a little:
     'age': 42
     }
 ```
+*Note: it is possible to simply write 42 instead of default(int, 42), the type will be infered from the value.*
+
+### Strict mode
+By passing `strict=True` to the `template` factory, or in the `validate` and `output` methods,
+the template will not accept extra keys in the dictionnary and will enforce the types
+instead of checking that the values are castable.
 
 ### Casting
 It is possible to cast the Python native types of a converted JSON file into more complex and/or custom-defined Python objects.
@@ -195,11 +201,3 @@ config_template = template({
 })
 ```
 The `animals` field can only contain a list containing at least 1 element and at most 5 elements. `min` defaults to 0 and if `max` is not present, the list length has no upper limit.
-
-## TODO
-The next features coming for jsontemplate are:
-
-- Clean exceptions
-- **cast mode** (may replace the current behavior): Instead of checking types, the `validate` method will try to cast the value to the template type and will fail only if the cast failed
-- **strict mode**: the json file must have no extra keys, that is, keys that are not defined in the template
-- simpler default values: Instead of the `default` specifier, the default value can simply written as is and the type will be infered from the default value
