@@ -6,7 +6,7 @@ setup(name='jsontemplate',
         description='Package to define json template in Python',
         author='Adrien El Zein',
         author_email='adrizein@gmail.com',
-        url='https://github.com/adrizein/jsontemplate',
+        url='https://github.com/adrizein/json-template',
         license='MIT',
         packages=['jsontemplate'],
         )

@@ -1,12 +1,12 @@
-# jsontemplate
-Python module for defining templates JSON files which can be used to validate their Python equivalents (obtained with `json.load` for example) and cast them into type-consistent dictionaries.
+# json-template
+**json-template** is a Python module for defining templates of JSON files. These templates can be used to validate the Python equivalent of a JSON file (obtained with `json.load` for example) and cast them into type-enforced dictionaries.
 
 ## Introduction
-The goal of jsontemplate is to allow developers to define JSON templates in Python in a simple and elegant manner.
+The goal of `jsontemplate` is to allow developers to define JSON templates in Python in a simple and elegant manner.
 
 The most obvious use case of this module is to check and enforce the types of a config file written in JSON instead of just using `json.load` and casting every value within the concerned submodules. This module allows for a more explicit and centralized way of controlling the types of the configuration values for a Python project.
 
-The Python 3 port of this package is available on the python3 branch.
+The Python 3 port of this package is available on the `python3` branch.
 
 ## Features
 Here a the most important features of jsontemplate:
@@ -45,7 +45,7 @@ config_template = template({
     "some_array": [float, int]
 })
 
-with open('./config.json', r) as jsonfile:
+with open('./config.json', 'rb') as jsonfile:
     config = json.load(jsonfile)
     # raises an exception if config doesn't respect the template
     config_template.validate(config)
@@ -107,7 +107,7 @@ Let's modify (and simplify) our template a little:
 >>> {
     'first_name': u'example',
     'last_name': u'example',
-    'age': 42
+    'age': 42,
 }
 
 >>> config_template.output({
@@ -115,16 +115,77 @@ Let's modify (and simplify) our template a little:
     'last_name': u'El Zein'})
 >>> {
     'first_name': u'Adrien',
-    'last_name': u'El Zein'
+    'last_name': u'El Zein',
     'age': 42
     }
 ```
-*Note: it is possible to simply write 42 instead of default(int, 42), the type will be infered from the value.*
+*Note: it is possible to simply write* `42` *instead of* `default(int, 42)`, *the type will be infered from the value.*
 
 ### Strict mode
 By passing `strict=True` to the `template` factory, or in the `validate` and `output` methods,
 the template will not accept extra keys in the json file and will enforce the types
-instead of checking that the values are castable.
+instead of checking that the values are castable.<br>
+It is also possible to use the strict modules only on sub-dictionaries with the `strict` keyword:
+```Python
+from jsontemplate import template, strict
+
+t = template({
+    "first_name": str,
+     "last_name": str,
+     'pokemon': strict({
+        'name': str,
+        'hp': int,
+     })
+})
+
+data = {
+    'first_name': u'Adrien',
+    'last_name': u'El Zein',
+    'age': 42,
+    'pokemon': {
+        'name': u'pikachu',
+        'hp': 42,
+        'age': 2,
+    }
+}
+
+t.validate(data) # will fail
+
+data = {
+    'first_name': u'Adrien',
+    'last_name': u'El Zein',
+    'age': 42,
+    'pokemon': {
+        'name': u'pikachu',
+        'hp': 42,
+    }
+}
+
+t.validate(data) # will pass
+
+data = {
+    'first_name': u'Adrien',
+    'last_name': u'El Zein',
+    'age': 42,
+    'pokemon': {
+        'name': u'pikachu',
+        'hp': 42,
+    }
+}
+
+t.validate(data, strict=True) # will fail
+
+t = template({
+    "first_name": str,
+     "last_name": str,
+     'pokemon': strict({
+        'name': str,
+        'hp': int,
+     })
+}, strict=True)
+
+t.validate(data) # will also fail
+```
 
 ### Casting
 It is possible to cast the Python native types of a converted JSON file into more complex and/or custom-defined Python objects.
@@ -183,18 +244,20 @@ config_template = template({
             (str, str, int))
 })
 ```
-The `animal` field in this template accepts a dictionary or a tuple. This behavior would be impossible to obtain with the set notation for mixins, since dicts can't be elements of sets.
+The `animal` field in this template accepts a dictionary or a tuple. This behavior would be impossible to obtain with the set notation for mixins, since dicts can't be elements of sets.<br>
+*Note: with this notation, the template will also have the nice behavior to try the types in the given order and stop at the first that works.
+This behavior would not have been guaranteed with sets because they don't conserve order either*
 
-### Cardinal constraints
+### Size constraints
 It is possible to check if a list has an number of elements between a min and a max:
 ```Python
-from jsontemplate import template, mixin
+from jsontemplate import template, size
 
 config_template = template({
     "first_name": str,
     "last_name": str,
     "age": int,
-    "animals": cardinal([{
+    "animals": size([{
             "name": str,
             "age": int,
             "specie": str
