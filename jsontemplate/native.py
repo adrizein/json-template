@@ -1,41 +1,28 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-# TODO: unittests
-
 import json
 
 from .exceptions import *
 
-__all__ = ['template', 'load_json', 'mixin', 'optional', 'default']
-
-
-def load_json(filename, t=None, full=False, strict=False):
-    with open(filename, 'rb') as jsonfile:
-        config = json.load(jsonfile)
-
-    if t is None:
-        return config
-
-    if isinstance(t, Template):
-        return t.output(config, full, strict)
-
-    t = template(t, strict=strict)
-    return t.output(config, full)
+__all__ = ['template', 'mixin', 'optional', 'default']
 
 
 def template(value, name='config', strict=False):
     if strict:
-        if value in {int, float, bool, str, unicode}:
+        if value in (int, float, bool, str, unicode, list, dict):
             return Native(value, name, strict)
     elif isinstance(value, type):
         return Native(value, name, strict)
+
+    if value is any:
+        return Template(name, strict)
 
     if isinstance(value, dict):
         return Dict(value, name, strict)
 
     if isinstance(value, list):
-        return Array(value, name, strict)
+        return List(value, name, strict)
 
     if isinstance(value, tuple):
         return Tuple(value, name, strict)
@@ -44,7 +31,7 @@ def template(value, name='config', strict=False):
         return mixin(*value, name=name, strict=strict)
 
     if isinstance(value, (int, float, str, unicode, bool)):
-        return default(type(value), value)
+        return default(type(value), value, name=name, strict=strict)
 
     if isinstance(value, Template):
         value.rebuild(name, strict)
@@ -61,18 +48,28 @@ class Template:
         if value is not None:
             self.value = template(value, name, strict)
 
+    def load(self, filepath, full=False, strict=False):
+        with open(filepath, 'rb') as file:
+            data = json.load(file)
+        return self.output(data, full, strict)
+
+    def loads(self, data, full=False, strict=False):
+        return self.output(json.loads(data), full, strict)
+
     def output(self, config, full=False, strict=False):
-        raise NotImplementedError
+        return config
 
     def example(self, full=False):
-        raise NotImplementedError
+        return u'example'
 
     def validate(self, config, strict=False):
-        raise NotImplementedError
+        pass
 
     def rebuild(self, name, strict):
-        self._name = name
+        self._name = name or self._name
         self._strict = strict
+        self.value.name = self._name
+        self.value.strict = strict
 
     @property
     def name(self):
@@ -95,6 +92,7 @@ class Template:
     def __repr__(self):
         return repr(self.value)
 
+
 class Native(Template):
 
     def __init__(self, value, name, strict=False):
@@ -113,16 +111,16 @@ class Native(Template):
 
     def validate(self, config, strict=False):
         if (self.strict or strict) and not isinstance(config, self.value):
-            raise ValidationError(self.value, config, self.name)
+            raise NativeValidationError(self.value, config, self.name)
         else:
             try:
                 old_type = type(config)
                 converted = self.value(config)
                 back_conv = old_type(converted)
                 if back_conv != config:
-                    raise ValidationError(self.value, config, self.name)
+                    raise NativeValidationError(self.value, config, self.name)
             except (ValueError, TypeError):
-                raise ValidationError(self.value, config, self.name)
+                raise NativeValidationError(self.value, config, self.name)
 
     def example(self, full=False):
         if self.value is unicode:
@@ -137,6 +135,18 @@ class Native(Template):
             self.validate(config, strict)
             return self.value(config)
 
+    def rebuild(self, name, strict):
+        self._name = name
+        self._strict = strict
+
+    @Template.name.setter
+    def name(self, name):
+        self._name = name
+
+    @Template.strict.setter
+    def strict(self, strict):
+        self._strict = strict
+
     def __repr__(self):
         return '<{}>'.format(self.value.__name__)
 
@@ -149,14 +159,15 @@ class Dict(Template):
 
     def validate(self, config, strict=False):
         if not isinstance(config, dict):
-            raise ValidationError(dict, config, self.name)
+            raise NativeValidationError(dict, config, self.name)
 
         if self.strict or strict:
-            keys = {config.iterkeys()} - {self.value.iterkeys()}
+            keys = set(config.iterkeys()).difference(set(self.value.iterkeys()))
             if len(keys) > 0:
                 raise KeysValidationError(keys, self.name)
-        for key, subt in self.value.iteritems():
-            subt.validate(config.get(key), strict)
+        else:
+            for key, subt in self.value.iteritems():
+                subt.validate(config.get(key), strict)
 
     def example(self, full=False):
         example = dict()
@@ -169,11 +180,7 @@ class Dict(Template):
     def output(self, config, full=False, strict=False):
         self.validate(config, strict)
         output = dict()
-        keys = set()
-        for k in config.iterkeys():
-            keys.add(k)
-        for k in self.value.iterkeys():
-            keys.add(k)
+        keys = set(config.iterkeys()).union(set(self.value.iterkeys()))
         for k in keys:
             t = self.value.get(k)
             v = config.get(k)
@@ -190,8 +197,8 @@ class Dict(Template):
         return output
 
     def rebuild(self, name, strict):
-        self.name = name
-        self.strict = strict
+        self._name = name
+        self._strict = strict
         for k,v in self.value.iteritems():
             v.rebuild('{}[{}]'.format(name, k), strict)
 
@@ -208,7 +215,7 @@ class Dict(Template):
             v.strict = strict
 
 
-class Array(Template):
+class List(Template):
 
     def __init__(self, value, name, strict=False):
         Template.__init__(self, name, strict)
@@ -216,40 +223,29 @@ class Array(Template):
 
     def validate(self, config, strict=False):
         if not isinstance(config, list):
-            raise TemplateTypeError("{} should be a list, but is actually <{}>: {}".format(
-                self.name,
-                type(config).__name__,
-                repr(config)))
+            raise NativeValidationError(list, config, self.name)
         ok = False
         for subt in self.value:
             try:
                 for element in config:
                     subt.validate(element, strict)
                 ok = True
-                break
+                return subt;
             except ValidationError:
                 continue
         if not ok:
-            raise ArrayValidationError(self.value, config, self.name)
+            raise ListValidationError(self.value, config, self.name)
 
     def example(self, full=False):
         return [self.value[0].example()]
 
     def output(self, config, full=False, strict=False):
-        self.validate(config, strict)
-        output = list()
-        for subt in self.value:
-            for element in config:
-                try:
-                    output.append(subt.output(element, full, strict))
-                except ValidationError:
-                    output = list()
-                    break
-        return output
+        t = self.validate(config, strict);
+        return [t.output(e, full, strict) for e in config];
 
     def rebuild(self, name, strict):
-        self.name = name
-        self.strict = strict
+        self._name = name
+        self._strict = strict
         for i,v in self.value:
             v.rebuild('{}[{}]'.format(name, i), strict)
 
@@ -265,11 +261,12 @@ class Array(Template):
         for v in self.value:
             v.strict = strict
 
-class Tuple(Array):
 
-    def validate(self, config, strict):
+class Tuple(List):
+
+    def validate(self, config, strict=False):
         if not isinstance(config, list):
-            raise ValidationError(list, config, self.name)
+            raise NativeValidationError(list, config, self.name)
         if len(self.value) == len(config):
             for element, subt in zip(config, self.value):
                 subt.validate(element, strict)
@@ -289,7 +286,7 @@ class optional(Template):
     def __init__(self, value, name=None, strict=False):
         Template.__init__(self, name, strict, value)
 
-    def validate(self, config, strict):
+    def validate(self, config, strict=False):
         if config is not None:
             self.value.validate(config, strict)
 
@@ -297,8 +294,7 @@ class optional(Template):
         self.validate(config, strict)
         if config is not None:
             return self.value.output(config, full, strict)
-        elif full:
-            return self.example(full)
+        return self.example(full)
 
     def example(self, full=False):
         if full:
@@ -307,9 +303,9 @@ class optional(Template):
 
 class default(optional):
 
-    def __init__(self, value, default_, name=None, strict=False):
+    def __init__(self, value, default, name=None, strict=False):
         optional.__init__(self, value, name, strict)
-        self.default = default_
+        self.default = default
 
     def example(self, full=False):
         return self.default
@@ -329,19 +325,16 @@ class mixin(Template):
         self.value = [template(t, name, strict) for t in templates]
 
     def example(self, full=False):
-        for typ in self.value:
-            return template(typ).example(full)
+        return self.value[0].example(full)
 
     def validate(self, config, strict=False):
-        ok = False
         for t in self.value:
             try:
                 t.validate(config, strict)
                 return t
             except ValidationError:
                 continue
-        if not ok:
-            raise MixinValidationError(self.value, config, self.name)
+        raise MixinValidationError(self.value, config, self.name)
 
     def output(self, config, full=False, strict=False):
         t = self.validate(config, strict)
@@ -364,4 +357,3 @@ class mixin(Template):
         self._strict = strict
         for v in self.value:
             v.strict = strict
-

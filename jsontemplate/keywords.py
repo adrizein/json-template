@@ -1,14 +1,37 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-__all__ = ['size', 'cast', 'starcast', 'kwcast', 'number']
+__all__ = ['size', 'cast', 'starcast', 'kwcast', 'number', 'strict', 'enum']
 
 from random import randrange
 
-from .native import Template
+from .native import Template, template
 from .exceptions import *
 
 number = {int, float}
+
+
+class strict(Template):
+
+    def __init__(self, value, name='config'):
+        Template.__init__(self, name, True, value)
+
+    def validate(self, config, strict=True):
+        self.value.validate(config, True)
+
+    def output(self, config, full=False, strict=True):
+        return self.value.output(config, full, True)
+
+    def example(self, full=False):
+        return self.value.example(full)
+
+    def rebuild(self, name, strict):
+        self._name = name
+        self.value.rebuild(name, True)
+
+    @Template.strict.setter
+    def strict(self, strict):
+        pass
 
 
 class size(Template):
@@ -59,13 +82,13 @@ class cast(Template):
     def validate(self, config, strict=False):
         self.value.validate(config, strict)
         try:
-            self.target(config)
+            x = self.value.output(config, full=False, strict=strict)
+            self.target(x)
         except:
             try:
-                x = self.value.output(config, full=False, strict=strict)
-                self.target(x)
-            except:
-                raise CastValidationError(self.target, config, self.name)
+                self.target(config)
+            except Exception as error:
+                raise CastValidationError(self.target, self.name, error)
 
     def output(self, config, full, strict):
         self.validate(config, strict)
@@ -78,8 +101,8 @@ class starcast(cast):
         self.value.validate(config, strict)
         try:
             self.target(*self.value.output(config, full=False, strict=strict))
-        except:
-            raise CastValidationError(self.target, config, self.name)
+        except Exception as error:
+            raise CastValidationError(self.target, self.name, error)
 
     def example(self, full=False):
         return self.target(*self.value.example(full))
@@ -95,8 +118,8 @@ class kwcast(cast):
         self.value.validate(config, strict)
         try:
             self.target(**self.value.output(config, full=False, strict=strict))
-        except:
-            raise CastValidationError(self.target, config, self.name)
+        except Exception as error:
+            raise CastValidationError(self.target, self.name, error)
 
     def example(self, full=False):
         return self.target(**self.value.example(full))
@@ -105,3 +128,37 @@ class kwcast(cast):
         self.validate(config, strict)
         return self.target(**self.value.output(config, full, strict))
 
+
+class enum(Template):
+
+    def __init__(self, *values, **kwargs):
+        Template.__init__(self, kwargs.get('name'), kwargs.get('strict', False))
+        if any(not isinstance(v, (unicode, str)) for v in values):
+            raise TemplateTypeError("Enums can only have string values, {} has non string values: {}".format(
+                self.name,
+                ', '.join(unicode(v) for v in values if not isinstance(v, (str, unicode))))
+            )
+        self.value = set(values)
+        self.upper_values = {v.upper() for v in values}
+
+    def example(self, full=False):
+        for v in self.value:
+            return self.value
+
+    def validate(self, config, strict=False):
+        if not isinstance(config, unicode):
+            raise NativeValidationError(unicode, config, self.name)
+        error = ValidationError('{} can only have the following values: {}. Instead, it is equal to {}'.format(
+            self.name,
+            ', '.join(str(v) for v in self.value),
+            config)
+        )
+        if self.strict or strict:
+            if not config in self.value:
+                raise error
+        elif config.upper() not in self.upper_values:
+            raise error
+
+    def output(self, config, full=False, strict=False):
+        self.validate(config, strict)
+        return config

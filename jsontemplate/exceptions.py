@@ -12,8 +12,9 @@ class TemplateValueError(TemplateError):
 class TemplateFormatError(TemplateError):
 
     def __init__(self, type):
-        msg = "JSON values are converted to either lists, dicts, unicode strings, ints, floats, or bools, {} is not accepted".format(repr(type))
-        Exception.__init__(self, msg)
+        msg = "JSON values are converted to either lists," \
+              "dicts, unicode strings, ints, floats, or bools, <{}> is not accepted".format(type.__name__)
+        TemplateError.__init__(self, msg)
 
 
 class TemplateTypeError(TemplateError):
@@ -27,21 +28,22 @@ class ValidationError(Exception):
 class NativeValidationError(ValidationError):
 
     def __init__(self, expected_type, actual_value, name):
-        msg = "{} should be a {}, but is instead equal to {} of type {}".format(
+        msg = "{} should be a <{}>, but is instead equal to {} of type <{}>".format(
             name,
-            repr(expected_type),
+            expected_type.__name__,
             actual_value,
-            repr(type(actual_value)))
+            type(actual_value).__name__)
         ValidationError.__init__(self, msg)
 
 
-class ArrayValidationError(ValidationError):
+class ListValidationError(ValidationError):
 
     def __init__(self, possible_types, actual_values, name):
-        msg = "The values of {} can have one of the following type: {}. Instead the have mixed types among {}.".format(
+        msg = "The values of {} can have one of the following types: {}." \
+              "Instead, they have mixed types among {}.".format(
             name,
-            ', '.join(repr(t) for t in possible_types)[:-1],
-            ', '.join({repr(type(v)) for v in actual_values})[:-1]
+            ', '.join('<{}>'.format(t) for t in possible_types)[:-1],
+            ', '.join({'<{}>'.format(type(v).__name__) for v in actual_values})[:-1]
         )
         ValidationError.__init__(self, msg)
 
@@ -49,7 +51,10 @@ class ArrayValidationError(ValidationError):
 class KeysValidationError(ValidationError):
 
     def __init__(self, keys, name):
-        msg = "The following keys are not supposed to be in {}: {}".format(name, keys)
+        msg = "The following keys are not supposed to be in {}: {}".format(
+            name,
+            ', '.join('"{}"'.format(key) for key in keys)
+        )
         ValidationError.__init__(self, msg)
 
 
@@ -69,9 +74,9 @@ class SizeValidationError(ValidationError):
 class MixinValidationError(ValidationError):
 
     def __init__(self, possible_types, actual_value, name):
-        msg = "{} could be of the following types: {}. Instead it is equal to {} of type {}".format(
+        msg = "{} can be of the following types: {}. Instead, it is equal to {} of type <{}>".format(
             name,
-            ', '.join(repr(t) for t in possible_types)[:-1],
+            ', '.join('<{}>'.format(t) for t in possible_types)[:-1],
             actual_value,
             repr(type(actual_value))
         )
@@ -80,6 +85,10 @@ class MixinValidationError(ValidationError):
 
 class CastValidationError(ValidationError):
 
-    def __init__(self, target, config, name):
-        msg = "{} could not be cast to {}. Its content is: {}".format(name, repr(target), repr(config))
+    def __init__(self, target, name, error):
+        try:
+            typename = '<{}>'.format(target.__name__)
+        except AttributeError:
+            typename = repr(target)
+        msg = "{} could not be cast to {} because of the following error:".format(name, typename, error)
         ValidationError.__init__(self, msg)
