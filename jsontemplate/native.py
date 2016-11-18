@@ -40,7 +40,7 @@ def template(value, name='config', strict=False):
     raise TemplateFormatError(value)
 
 
-class Template:
+class Template(object):
 
     def __init__(self, name='config', strict=False, value=None):
         self._name = name
@@ -49,8 +49,8 @@ class Template:
             self.value = template(value, name, strict)
 
     def load(self, filepath, full=False, strict=False):
-        with open(filepath, 'rb') as file:
-            data = json.load(file)
+        with open(filepath, 'rb') as f:
+            data = json.load(f)
         return self.output(data, full, strict)
 
     def loads(self, data, full=False, strict=False):
