@@ -9,6 +9,13 @@ from jsontemplate import template, starcast
 from jsontemplate.exceptions import ValidationError
 
 
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class Animal:
 
     def __init__(self, age=1, name=u'medor', specie=u'dog'):
@@ -74,7 +81,7 @@ class StarCastTests(unittest.TestCase):
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
-        self.assertEquals(self.template.example(), {
+        self.assertDictEqual(self.template.example(), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -84,7 +91,7 @@ class StarCastTests(unittest.TestCase):
         })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -97,7 +104,7 @@ class StarCastTests(unittest.TestCase):
         data = deepcopy(self.data)
         data['age'] = int(data['age'])
         data['animal'] = Animal(*self.data['animal'])
-        self.assertEquals(self.template.output(self.data), data)
+        self.assertDictEqual(self.template.output(self.data), data)
 
 if __name__ == '__main__':
     unittest.main()

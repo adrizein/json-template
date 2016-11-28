@@ -7,6 +7,13 @@ import unittest
 from jsontemplate import template, optional, mixin
 
 
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class MixinTests(unittest.TestCase):
 
     dict_template = {
@@ -62,7 +69,7 @@ class MixinTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_example(self):
-        self.assertEquals(self.template.example(), {
+        self.assertDictEqual(self.template.example(), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -75,7 +82,7 @@ class MixinTests(unittest.TestCase):
         })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -89,7 +96,7 @@ class MixinTests(unittest.TestCase):
         })
 
     def test_output(self):
-        self.assertEquals(self.template.output(self.data), self.data)
+        self.assertDictEqual(self.template.output(self.data), self.data)
 
 if __name__ == '__main__':
     unittest.main()

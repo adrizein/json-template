@@ -7,6 +7,14 @@ import unittest
 from jsontemplate import template
 from jsontemplate.exceptions import *
 
+
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class NativeTests(unittest.TestCase):
 
     dict_template = {
@@ -76,7 +84,7 @@ class NativeTests(unittest.TestCase):
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
-        self.assertEquals(self.template.example(), {
+        self.assertDictEqual(self.template.example(), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -92,7 +100,7 @@ class NativeTests(unittest.TestCase):
             })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -108,7 +116,7 @@ class NativeTests(unittest.TestCase):
             })
 
     def test_output(self):
-        self.assertEquals(self.template.output(self.data), self.data)
+        self.assertDictEqual(self.template.output(self.data), self.data)
 
 if __name__ == '__main__':
     unittest.main()

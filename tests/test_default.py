@@ -8,6 +8,14 @@ from copy import deepcopy
 from jsontemplate import template, default
 from jsontemplate.exceptions import *
 
+
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class DefaultTests(unittest.TestCase):
 
     dict_template = {
@@ -78,7 +86,7 @@ class DefaultTests(unittest.TestCase):
 
     def test_example(self):
         example = self.template.example()
-        self.assertEquals(example, {
+        self.assertDictEqual(example, {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -88,7 +96,7 @@ class DefaultTests(unittest.TestCase):
         })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -98,13 +106,13 @@ class DefaultTests(unittest.TestCase):
         })
 
     def test_output(self):
-        self.assertEquals(self.template.output(self.data), self.data)
+        self.assertDictEqual(self.template.output(self.data), self.data)
 
     def test_output_default(self):
         data = deepcopy(self.data)
         del self.data['animals'][0]['specie']
         data['animals'][0]['specie'] = u'cat'
-        self.assertEquals(self.template.output(self.data), data)
+        self.assertDictEqual(self.template.output(self.data), data)
 
 if __name__ == '__main__':
     unittest.main()

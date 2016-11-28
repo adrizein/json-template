@@ -9,6 +9,13 @@ from jsontemplate import template, optional, cast
 from jsontemplate.exceptions import *
 
 
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class CastTests(unittest.TestCase):
 
     dict_template = {
@@ -72,7 +79,7 @@ class CastTests(unittest.TestCase):
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
-        self.assertEquals(self.template.example(), {
+        self.assertDictEqual(self.template.example(), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -85,7 +92,7 @@ class CastTests(unittest.TestCase):
         })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -104,7 +111,7 @@ class CastTests(unittest.TestCase):
         del data['animal']['age']
         del self.data['animal']['age']
         data['scores'] = sorted(data['scores'], reverse=True)
-        self.assertEquals(self.template.output(self.data), data)
+        self.assertDictEqual(self.template.output(self.data), data)
 
     def test_output_optional_full(self):
         data = deepcopy(self.data)
@@ -112,14 +119,14 @@ class CastTests(unittest.TestCase):
         data['animal']['age'] = 0
         del self.data['animal']['age']
         data['scores'] = sorted(data['scores'], reverse=True)
-        self.assertEquals(self.template.output(self.data, full=True), data)
+        self.assertDictEqual(self.template.output(self.data, full=True), data)
 
     def test_output(self):
         data = deepcopy(self.data)
         data['age'] = int(data['age'])
         data['animal']['age'] = int(data['animal']['age'])
         data['scores'] = sorted(data['scores'], reverse=True)
-        self.assertEquals(self.template.output(self.data), data)
+        self.assertDictEqual(self.template.output(self.data), data)
 
 if __name__ == '__main__':
     unittest.main()

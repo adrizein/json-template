@@ -9,6 +9,13 @@ from jsontemplate import template, optional
 from jsontemplate.exceptions import *
 
 
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class OptionalTests(unittest.TestCase):
 
     dict_template = {
@@ -79,14 +86,14 @@ class OptionalTests(unittest.TestCase):
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
-        self.assertEquals(self.template.example(), {
+        self.assertDictEqual(self.template.example(), {
             'first_name': u'example',
             'last_name': u'example',
             'location': [u'example', 0],
             })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -100,7 +107,7 @@ class OptionalTests(unittest.TestCase):
             })
 
     def test_output(self):
-        self.assertEquals(self.template.output(self.data), self.data)
+        self.assertDictEqual(self.template.output(self.data), self.data)
 
     def test_output_full(self):
         data = deepcopy(self.data)
@@ -110,7 +117,7 @@ class OptionalTests(unittest.TestCase):
         self.data['animal'] = {'name': u'example', 'specie': u'example', 'age': 0}
         self.data['age'] = 0
         self.data['scores'] = [0]
-        self.assertEquals(self.template.output(data, full=True), self.data)
+        self.assertDictEqual(self.template.output(data, full=True), self.data)
 
 if __name__ == '__main__':
     unittest.main()

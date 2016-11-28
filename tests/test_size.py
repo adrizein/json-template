@@ -7,6 +7,14 @@ import unittest
 from jsontemplate import template, size
 from jsontemplate.exceptions import *
 
+
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
+
+
 class SizeTests(unittest.TestCase):
 
     dict_template = {
@@ -72,7 +80,7 @@ class SizeTests(unittest.TestCase):
         self.assertLessEqual(len(data['scores']), 5)
         self.assertGreaterEqual(len(data['scores']), 1)
         data['scores'] = [data['scores'][0]]
-        self.assertEquals(data, {
+        self.assertDictEqual(data, {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -86,7 +94,7 @@ class SizeTests(unittest.TestCase):
         })
 
     def test_example_full(self):
-        self.assertEquals(self.template.example(full=True), {
+        self.assertDictEqual(self.template.example(full=True), {
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
@@ -102,7 +110,7 @@ class SizeTests(unittest.TestCase):
         })
 
     def test_output(self):
-        self.assertEquals(self.template.output(self.data), self.data)
+        self.assertDictEqual(self.template.output(self.data), self.data)
 
 if __name__ == '__main__':
     unittest.main()
