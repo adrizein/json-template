@@ -5,7 +5,7 @@ import json
 import unittest
 from copy import deepcopy
 
-from jsontemplate import template, optional, kwcast
+from jsontemplate import template, starcast
 from jsontemplate.exceptions import ValidationError
 
 
@@ -31,19 +31,15 @@ class Animal:
         })
 
 
-class KWCastTests(unittest.TestCase):
+class StarCastTests(unittest.TestCase):
 
     dict_template = {
         "first_name": str,
         "last_name": str,
         "age": int,
-        "animal": kwcast(Animal, {
-            "name": str,
-            "age": optional(int),
-            "specie": str,
-        }),
+        "animal": starcast(Animal, (int, str, str)),
         "location": (str, int),
-        "scores": [{float, int}]
+        "scores": [{float, int}],
     }
 
     @classmethod
@@ -53,11 +49,7 @@ class KWCastTests(unittest.TestCase):
             "first_name": "Adrien",
             "last_name": "El Zein",
             "age": 25,
-            "animal": {
-                "name": "kupa",
-                "age": 8,
-                "specie": "cat"
-            },
+            "animal": [8, "kupa", "cat"],
             "location": ["Paris", 75001],
             "scores": [0.34, 0.54, 0.66, 0.81, 1.44, 23.4, 50]
         }"""
@@ -78,7 +70,7 @@ class KWCastTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_invalidate_data(self):
-        self.data['animal']['age'] = 'a12'
+        self.data['animal'][0] = 'a12'
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
@@ -86,7 +78,7 @@ class KWCastTests(unittest.TestCase):
             'first_name': u'example',
             'last_name': u'example',
             'age': 0,
-            'animal': Animal(name=u'example', specie=u'example'),
+            'animal': Animal(name=u'example', age=0, specie=u'example'),
             'location': [u'example', 0],
             'scores': [0.0]
         })
@@ -101,25 +93,10 @@ class KWCastTests(unittest.TestCase):
             'scores': [0.0]
         })
 
-    def test_output_optional(self):
-        data = deepcopy(self.data)
-        data['age'] = int(data['age'])
-        del self.data['animal']['age']
-        data['animal'] = Animal(**self.data['animal'])
-        self.assertEquals(self.template.output(self.data), data)
-
-    def test_output_optional_full(self):
-        data = deepcopy(self.data)
-        data['age'] = int(data['age'])
-        self.data['animal']['age'] = 0
-        data['animal'] = Animal(**self.data['animal'])
-        del self.data['animal']['age']
-        self.assertEquals(self.template.output(self.data, full=True), data)
-
     def test_output(self):
         data = deepcopy(self.data)
         data['age'] = int(data['age'])
-        data['animal'] = Animal(**self.data['animal'])
+        data['animal'] = Animal(*self.data['animal'])
         self.assertEquals(self.template.output(self.data), data)
 
 if __name__ == '__main__':
