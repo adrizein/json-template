@@ -30,7 +30,7 @@ class strict(Template):
         self.value.rebuild(name, True)
 
     @Template.strict.setter
-    def strict(self, strict):
+    def strict(self, _strict):
         pass
 
 
@@ -90,7 +90,7 @@ class cast(Template):
             except Exception as error:
                 raise CastValidationError(self.target, self.name, error)
 
-    def output(self, config, full, strict):
+    def output(self, config, full=False, strict=False):
         self.validate(config, strict)
         return self.target(self.value.output(config, full, strict))
 
@@ -138,12 +138,12 @@ class enum(Template):
                 self.name,
                 ', '.join(unicode(v) for v in values if not isinstance(v, (str, unicode))))
             )
-        self.value = set(values)
-        self.upper_values = {v.upper() for v in values}
+        self.value = {unicode(value) for value in values}
+        self.upper_values = {unicode(v.upper()) for v in values}
 
     def example(self, full=False):
         for v in self.value:
-            return self.value
+            return v
 
     def validate(self, config, strict=False):
         if not isinstance(config, unicode):
@@ -162,3 +162,15 @@ class enum(Template):
     def output(self, config, full=False, strict=False):
         self.validate(config, strict)
         return config
+
+    def rebuild(self, name, strict):
+        self._name = name
+        self._strict = strict
+
+    @Template.name.setter
+    def name(self, name):
+        self._name = name
+
+    @Template.strict.setter
+    def strict(self, strict):
+        self._strict = strict
