@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import json
@@ -6,6 +6,13 @@ import json
 from .exceptions import *
 
 __all__ = ['template', 'mixin', 'optional', 'default']
+
+
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
 
 
 def template(value, name='config', strict=False):
@@ -155,23 +162,23 @@ class Dict(Template):
 
     def __init__(self, value, name='config', strict=False):
         Template.__init__(self, name, strict)
-        self.value = {k: template(v, '{}[{}]'.format(name, k), strict) for k,v in value.iteritems()}
+        self.value = {k: template(v, '{}[{}]'.format(name, k), strict) for k,v in value.items()}
 
     def validate(self, config, strict=False):
         if not isinstance(config, dict):
             raise NativeValidationError(dict, config, self.name)
 
         if self.strict or strict:
-            keys = set(config.iterkeys()).difference(set(self.value.iterkeys()))
+            keys = set(config.keys()).difference(set(self.value.keys()))
             if len(keys) > 0:
                 raise KeysValidationError(keys, self.name)
-        else:
-            for key, subt in self.value.iteritems():
-                subt.validate(config.get(key), strict)
+
+        for key, subt in self.value.items():
+            subt.validate(config.get(key), strict)
 
     def example(self, full=False):
         example = dict()
-        for k,v in self.value.iteritems():
+        for k,v in self.value.items():
             value = v.example(full)
             if value is not None:
                 example[k] = value
@@ -180,7 +187,7 @@ class Dict(Template):
     def output(self, config, full=False, strict=False):
         self.validate(config, strict)
         output = dict()
-        keys = set(config.iterkeys()).union(set(self.value.iterkeys()))
+        keys = set(config.keys()).union(set(self.value.keys()))
         for k in keys:
             t = self.value.get(k)
             v = config.get(k)
@@ -199,19 +206,19 @@ class Dict(Template):
     def rebuild(self, name, strict):
         self._name = name
         self._strict = strict
-        for k,v in self.value.iteritems():
+        for k,v in self.value.items():
             v.rebuild('{}[{}]'.format(name, k), strict)
 
     @Template.name.setter
     def name(self, name):
         self._name = name
-        for k,v in self.value.iteritems():
+        for k,v in self.value.items():
             v.name = '{}[{}]'.format(name, k)
 
     @Template.strict.setter
     def strict(self, strict):
         self._strict = strict
-        for v in self.value.itervalues():
+        for v in self.value.values():
             v.strict = strict
 
 
@@ -357,3 +364,4 @@ class mixin(Template):
         self._strict = strict
         for v in self.value:
             v.strict = strict
+

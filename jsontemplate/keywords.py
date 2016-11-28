@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 __all__ = ['size', 'cast', 'starcast', 'kwcast', 'number', 'strict', 'enum']
@@ -9,6 +9,13 @@ from .native import Template, template
 from .exceptions import *
 
 number = {int, float}
+
+
+# python3 compatibility testing
+try:
+    unicode('hello')
+except:
+    unicode = str
 
 
 class strict(Template):
