@@ -14,10 +14,12 @@ Here a the most important features of jsontemplate:
 3. Generation of example JSON file and Python dict from a template
 4. Optional fields
 5. Default values
-6. Casting to custom-defined Python objects
+6. Casting to custom Python objects
 7. Mixin types
 8. Lists with or without a constrained number of elements
-8. Strict mode (no extra keys and casting)
+9. Strict mode (no extra keys and no casting)
+10. Enumerators
+
 
 ## Basic usage
 
