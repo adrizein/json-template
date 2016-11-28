@@ -6,8 +6,6 @@ The goal of `jsontemplate` is to allow developers to define JSON templates in Py
 
 The most obvious use case of this module is to check and enforce the types of a config file written in JSON instead of just using `json.load` and casting every value within the concerned submodules. This module allows for a more explicit and centralized way of controlling the types of the configuration values for a Python project.
 
-The Python 3 port of this package is available on the `python3` branch.
-
 ## Features
 Here a the most important features of jsontemplate:
 
