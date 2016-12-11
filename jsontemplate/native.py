@@ -38,6 +38,8 @@ def template(value, name='config', strict=False):
         return mixin(*value, name=name, strict=strict)
 
     if isinstance(value, (int, float, str, unicode, bool)):
+        if type(value) is str:
+            value = unicode(value)
         return default(type(value), value, name=name, strict=strict)
 
     if isinstance(value, Template):

@@ -26,7 +26,7 @@ class DefaultTests(unittest.TestCase):
             {
                 "name": str,
                 "age": int,
-                "specie": default(str, u'cat'),
+                "specie": 'cat'
             }
         ], []),
         "location": (str, int),
