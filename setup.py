@@ -1,9 +1,9 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 from setuptools import setup
 
 setup(name='jsontemplate',
         version='0.2',
-        description='Package to define json template in Python',
+        description='Package to define json templates in Python',
         author='Adrien El Zein',
         author_email='adrizein@gmail.com',
         url='https://github.com/adrizein/json-template',
