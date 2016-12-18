@@ -30,7 +30,7 @@ class SizeTests(unittest.TestCase):
             }
         ],
         "location": (str, int),
-        "scores": size([{float, int}], min=1, max=5)
+        "scores": size([{float, int}], min_value=1, max_value=5)
     }
 
     @classmethod
