@@ -1,5 +1,4 @@
 # json-template
-**json-template** is a Python module for defining templates of JSON files. These templates can be used to validate the Python equivalent of a JSON file (obtained with `json.load` for example) and cast them into type-enforced dictionaries.
 
 ## Introduction
 The goal of `jsontemplate` is to allow developers to define JSON templates in Python in a simple and elegant manner.
