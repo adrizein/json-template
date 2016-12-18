@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 
@@ -61,7 +62,7 @@ class MixinTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_simple_mixin(self):
-        self.data['animal'] = u'cat'
+        self.data['animal'] = 'cat'
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_complex_mixin_optional(self):
@@ -70,28 +71,28 @@ class MixinTests(unittest.TestCase):
 
     def test_example(self):
         self.assertDictEqual(self.template.example(), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                    'name': u'example',
+                    'name': 'example',
                     'age': 0,
                 },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                    'name': u'example',
+                    'name': 'example',
                     'age': 0,
-                    'specie': u'example'
+                    'specie': 'example'
                 },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 

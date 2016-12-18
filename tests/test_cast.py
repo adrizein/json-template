@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 from copy import deepcopy
@@ -63,7 +64,7 @@ class CastTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_str_to_int(self):
-        self.data['age'] = u'12'
+        self.data['age'] = '12'
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_nested_float_to_int(self):
@@ -80,28 +81,28 @@ class CastTests(unittest.TestCase):
 
     def test_example(self):
         self.assertDictEqual(self.template.example(), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                'name': u'example',
-                'specie': u'example'
+                'name': 'example',
+                'specie': 'example'
             },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                'name': u'example',
+                'name': 'example',
                 'age': 0,
-                'specie': u'example'
+                'specie': 'example'
             },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 

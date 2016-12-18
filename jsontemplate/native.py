@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 
 from .exceptions import *
@@ -69,7 +70,7 @@ class Template(object):
         return config
 
     def example(self, full=False):
-        return u'example'
+        return 'example'
 
     def validate(self, config, strict=False):
         pass
@@ -133,7 +134,7 @@ class Native(Template):
 
     def example(self, full=False):
         if self.value is unicode:
-            return u'example'
+            return 'example'
         return self.value()
 
     def output(self, config, full=False, strict=False):

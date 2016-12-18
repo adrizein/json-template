@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__all__ = ['size', 'cast', 'starcast', 'kwcast', 'number', 'strict', 'enum']
-
+from __future__ import unicode_literals
 from random import randrange
 
 from .native import Template, template
 from .exceptions import *
+
+__all__ = ['size', 'cast', 'starcast', 'kwcast', 'number', 'strict', 'enum', 'choice']
 
 number = {int, float}
 
@@ -181,3 +182,5 @@ class enum(Template):
     @Template.strict.setter
     def strict(self, strict):
         self._strict = strict
+
+choice = enum;

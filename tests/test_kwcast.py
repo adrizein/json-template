@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 from copy import deepcopy
@@ -18,7 +19,7 @@ except:
 
 class Animal:
 
-    def __init__(self, age=1, name=u'medor', specie=u'dog'):
+    def __init__(self, age=1, name='medor', specie='dog'):
         self.age = int(age)
         self.specie = specie
         self.name = name
@@ -90,21 +91,21 @@ class KWCastTests(unittest.TestCase):
 
     def test_example(self):
         self.assertDictEqual(self.template.example(), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
-            'animal': Animal(name=u'example', specie=u'example'),
-            'location': [u'example', 0],
+            'animal': Animal(name='example', specie='example'),
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
-            'animal': Animal(name=u'example', specie=u'example', age=0),
-            'location': [u'example', 0],
+            'animal': Animal(name='example', specie='example', age=0),
+            'location': ['example', 0],
             'scores': [0.0]
         })
 

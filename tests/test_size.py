@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 
@@ -81,31 +82,31 @@ class SizeTests(unittest.TestCase):
         self.assertGreaterEqual(len(data['scores']), 1)
         data['scores'] = [data['scores'][0]]
         self.assertDictEqual(data, {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [{
-                'name': u'example',
+                'name': 'example',
                 'age': 0,
-                'specie': u'example'
+                'specie': 'example'
             }],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [
                 {
-                    'name': u'example',
+                    'name': 'example',
                     'age': 0,
-                    'specie': u'example'
+                    'specie': 'example'
                 }
             ],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]*5
         })
 

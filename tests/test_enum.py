@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 
@@ -58,7 +59,7 @@ class EnumTests(unittest.TestCase):
         self.template = None
 
     def test_validate_enum(self):
-        for specie in u'cat', u'dog', u'fish', u'turtle', u'bird':
+        for specie in 'cat', 'dog', 'fish', 'turtle', 'bird':
             self.data['animal']['specie'] = specie
             self.assertIsNone(self.template.validate(self.data))
 
@@ -66,7 +67,7 @@ class EnumTests(unittest.TestCase):
         self.assertRaises(TemplateTypeError, lambda x: enum(*x), (1, 2, 'dog'))
 
     def test_invalidate_enum(self):
-        self.data['animal']['specie'] = u'bat'
+        self.data['animal']['specie'] = 'bat'
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_invalidate_strict_enum(self):
@@ -77,15 +78,15 @@ class EnumTests(unittest.TestCase):
     @unittest.skip("TODO: 'specie' is not necessarily equal to turtle")
     def test_example(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                'name': u'example',
+                'name': 'example',
                 'age': 0,
-                'specie': u'turtle'
+                'specie': 'turtle'
             },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 

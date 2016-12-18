@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 from copy import deepcopy
@@ -78,7 +79,7 @@ class OptionalTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_invalid_int(self):
-        self.data['age'] = u'1az2'
+        self.data['age'] = '1az2'
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_validate_invalid_str(self):
@@ -87,22 +88,22 @@ class OptionalTests(unittest.TestCase):
 
     def test_example(self):
         self.assertDictEqual(self.template.example(), {
-            'first_name': u'example',
-            'last_name': u'example',
-            'location': [u'example', 0],
+            'first_name': 'example',
+            'last_name': 'example',
+            'location': ['example', 0],
             })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animal': {
-                'name': u'example',
+                'name': 'example',
                 'age': 0,
-                'specie': u'example'
+                'specie': 'example'
                 },
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0],
             })
 
@@ -114,7 +115,7 @@ class OptionalTests(unittest.TestCase):
         del data['animal']
         del data['age']
         del data['scores']
-        self.data['animal'] = {'name': u'example', 'specie': u'example', 'age': 0}
+        self.data['animal'] = {'name': 'example', 'specie': 'example', 'age': 0}
         self.data['age'] = 0
         self.data['scores'] = [0]
         self.assertDictEqual(self.template.output(data, full=True), self.data)

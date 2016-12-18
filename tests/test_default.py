@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 from copy import deepcopy
@@ -87,21 +88,21 @@ class DefaultTests(unittest.TestCase):
     def test_example(self):
         example = self.template.example()
         self.assertDictEqual(example, {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
         })
 
@@ -111,7 +112,7 @@ class DefaultTests(unittest.TestCase):
     def test_output_default(self):
         data = deepcopy(self.data)
         del self.data['animals'][0]['specie']
-        data['animals'][0]['specie'] = u'cat'
+        data['animals'][0]['specie'] = 'cat'
         self.assertDictEqual(self.template.output(self.data), data)
 
 if __name__ == '__main__':

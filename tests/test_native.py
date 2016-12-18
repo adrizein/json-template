@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import json
 import unittest
 
@@ -68,11 +69,11 @@ class NativeTests(unittest.TestCase):
         self.assertIsNone(self.template.validate(self.data))
 
     def test_validate_invalid_tuple(self):
-        self.data['location'][1] = u'75001ZEZ'
+        self.data['location'][1] = '75001ZEZ'
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_validate_invalid_list(self):
-        self.data['scores'][4] = u'2az'
+        self.data['scores'][4] = '2az'
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_validate_invalid_dict(self):
@@ -80,38 +81,38 @@ class NativeTests(unittest.TestCase):
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_validate_invalid_type(self):
-        self.data['first_name'] = [u'Adrien', u'El Zein']
+        self.data['first_name'] = ['Adrien', 'El Zein']
         self.assertRaises(ValidationError, self.template.validate, self.data)
 
     def test_example(self):
         self.assertDictEqual(self.template.example(), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [
                 {
-                    'name': u'example',
+                    'name': 'example',
                     'age': 0,
-                    'specie': u'example'
+                    'specie': 'example'
                     }
                 ],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
             })
 
     def test_example_full(self):
         self.assertDictEqual(self.template.example(full=True), {
-            'first_name': u'example',
-            'last_name': u'example',
+            'first_name': 'example',
+            'last_name': 'example',
             'age': 0,
             'animals': [
                 {
-                    'name': u'example',
+                    'name': 'example',
                     'age': 0,
-                    'specie': u'example'
+                    'specie': 'example'
                     }
                 ],
-            'location': [u'example', 0],
+            'location': ['example', 0],
             'scores': [0.0]
             })
 
